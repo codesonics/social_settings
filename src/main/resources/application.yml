@@ -1,32 +1,48 @@
 server:
-    port: 8081
+  port: 8081
 
 spring:
-    application:
-        name: "social"
+  application:
+    name: "social"
 
-    security:
-        oauth2:
-            client:
-                registration:
-                    facebook:
-                        client-id: "380745696820214"
-                        client-secret: "88a4a2795108c6a4fd93382be8f0b75"
-                    google:
-                        client-id: "xxx"
-                        client-secret: "xxx"
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            client-id: "380745696820214"
+            client-secret: "88a4a2795108c6a4fd93382be8f0b75"
+          google:
+            client-id: "xxx"
+            client-secret: "xxx"
+          kakao:
+            client-id: 3e6a005cd5712bc58005d784bd9f9e0c
+            client-secret: eKbNfFJ5WJBoIGnDeYOA1ozqfAyZrsTz
+            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao" # http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope:
+              - account_email
+              - profile
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization_uri: https://kauth.kakao.com/oauth/authorize
+            token_uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user_name_attribute: id
 
 
-    jpa:
-        database: mysql
-        show-sql: true
-        generate-ddl: true
-        open-in-view: false
-        hibernate:
-            ddl-auto: create
+  jpa:
+    database: mysql
+    show-sql: true
+    generate-ddl: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
 
-    datasource:
-        url: jdbc:mysql:localhost:3366/social
-        username: root
-        password:
-        driver-class-name: com.mysql.cj.jdbc.Driver
+  datasource:
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3366/social
