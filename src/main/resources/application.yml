@@ -1,0 +1,17 @@
+server:
+    port: 8081
+
+spring:
+    application:
+        name: "social"
+
+    security:
+        oauth2:
+            client:
+                registration:
+                    facebook:
+                        client-id: "380745696820214"
+                        client-secret: "88a4a2795108c6a4fd93382be8f0b75"
+                    google:
+                        client-id: "xxx"
+                        client-secret: "xxx"
