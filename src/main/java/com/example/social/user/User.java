@@ -1,6 +1,7 @@
 package com.example.social.user;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Builder
     public User(String name, String email) {
         this.name = name;
         this.email = email;

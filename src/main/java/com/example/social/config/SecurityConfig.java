@@ -31,8 +31,8 @@ import static com.example.social.user.SocialType.KAKAO;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final Environment environment;
     private final String registration = "spring.security.oauth2.client.registration.";
-    private final FacebookOauth2UserService facebookOauth2UserService;
-    private static final String DEFAULT_LOGIN_REDIRECT_URL = "http://localhost:8080/login/oauth2/code/kakao";
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private static final String DEFAULT_LOGIN_REDIRECT_URL = "{baseUrl}/login/oauth2/code/";
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -48,7 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .userInfoEndpoint(user ->
                                 user
                                         /*.oidcUserService()*/
-                                        .userService(facebookOauth2UserService)
+                                        .userService(customOAuth2UserService)
 
                         )
                 )
@@ -56,11 +56,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties properties){
+    public ClientRegistrationRepository clientRegistrationRepository(){
         final List<ClientRegistration> clientRegistrations = Arrays.asList(
                 googleClientRegistration(),
                 facebookClientRegistration(),
-                kakaoClientRegistration(properties)
+                kakaoClientRegistration()
         );
         return new InMemoryClientRegistrationRepository(clientRegistrations);
     }
@@ -97,21 +97,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture,gender,birthday")
                 .build();
     }
-    private ClientRegistration kakaoClientRegistration(OAuth2ClientProperties properties) {
-        OAuth2ClientProperties.Registration registration
-                = properties.getRegistration().get(KAKAO.getValue());
-        OAuth2ClientProperties.Provider provider = properties.getProvider().get(KAKAO.getValue());
+    private ClientRegistration kakaoClientRegistration() {
+        final String clientId = environment.getProperty(registration + KAKAO.getValue() + ".client-id");
+        final String clientSecret = environment.getProperty(registration + KAKAO.getValue() + ".client-secret");
         return ClientRegistration.withRegistrationId(KAKAO.getValue())
-                .clientId(registration.getClientId())
-                .clientSecret(registration.getClientSecret())
-                .clientAuthenticationMethod(ClientAuthenticationMethod.BASIC)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri(DEFAULT_LOGIN_REDIRECT_URL)
-                .scope(registration.getScope())
-                .authorizationUri(provider.getAuthorizationUri())
-                .tokenUri(provider.getTokenUri())
-                .userInfoUri(provider.getUserInfoUri())
-                .userNameAttributeName(IdTokenClaimNames.SUB)
+                .redirectUri(DEFAULT_LOGIN_REDIRECT_URL + KAKAO.getValue())
+                .scope("account_email", "profile")
+                .authorizationUri("https://kauth.kakao.com/oauth/authorize")
+                .tokenUri("https://kauth.kakao.com/oauth/token")
+                .userInfoUri("https://kapi.kakao.com/v2/user/me")
+                .userNameAttributeName("id")
                 .clientName("Kakao")
                 .build();
     }

@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
@@ -16,8 +16,8 @@ spring:
             client-id: "xxx"
             client-secret: "xxx"
           kakao:
-            client-id: 3e6a005cd5712bc58005d784bd9f9e0c
-            client-secret: eKbNfFJ5WJBoIGnDeYOA1ozqfAyZrsTz
+            client-id: "3e6a005cd5712bc58005d784bd9f9e0c"
+            client-secret: "eKbNfFJ5WJBoIGnDeYOA1ozqfAyZrsTz"
             redirect-uri: "http://localhost:8080/login/oauth2/code/kakao" # http://localhost:8080/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
