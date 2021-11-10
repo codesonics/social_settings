@@ -2,6 +2,8 @@ package com.example.social.config;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import ch.qos.logback.core.net.server.Client;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -41,19 +44,103 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                 .anyRequest().authenticated()
 
                 )
+                .oauth2Login().userInfoEndpoint().userService(customOAuth2UserService)
+
                 //.oauth2Login(Customizer.withDefaults())
-                .oauth2Login(oauth2 -> oauth2
+               /* .oauth2Login(oauth2 -> oauth2
                         .clientRegistrationRepository(clientRegistrationRepository())
                         .authorizedClientService(oAuth2AuthorizedClientService())
                         .userInfoEndpoint(user ->
                                 user
-                                        /*.oidcUserService()*/
+                                        //.oidcUserService()
                                         .userService(customOAuth2UserService)
 
                         )
-                )
+                        //.defaultSuccessUrl()
+                        //.failureHandler()
+                )*/
+
                 ;
+
+/*        http
+                    .headers().frameOptions().disable()
+                .and()
+                    .csrf().disable()
+                .authorizeRequests()
+                    .antMatchers("/member/update").authenticated()
+                        .anyRequest().permitAll()
+                .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .and()
+                    .formLogin()
+                    .loginPage("/login" )
+                    .permitAll()
+                    .usernameParameter("j_username")
+                    .passwordParameter("j_password")
+                    .loginProcessingUrl("/j_spring_security_check")
+                    .defaultSuccessUrl("/", false)
+                    .failureUrl("/login" + "?login=fail")
+                .and()
+                    .oauth2Login()
+                    .userInfoEndpoint()
+                    .userService(customOAuth2UserService)
+                .and()
+                    .defaultSuccessUrl("/",false)
+                .and()
+                    .logout().permitAll()
+                    .logoutUrl("/j_spring_security_logout")
+                    .logoutSuccessUrl("/")
+                    .deleteCookies("JSESSIONID")
+                    .invalidateHttpSession(true)
+                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                    .sessionFixation().migrateSession()
+                    .maximumSessions(3)
+        ;*/
     }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository(OAuth2ClientProperties oAuth2ClientProperties){
+
+        List<ClientRegistration> registrations = oAuth2ClientProperties.getRegistration().keySet().stream()
+                .map(client -> getRegistration(oAuth2ClientProperties, client))
+                .filter(Objects::nonNull) .collect(Collectors.toList());
+
+        return new InMemoryClientRegistrationRepository(registrations);
+    }
+
+    public ClientRegistration getRegistration(OAuth2ClientProperties oAuth2ClientProperties, String client) {
+
+        OAuth2ClientProperties.Registration registration = oAuth2ClientProperties.getRegistration().get(client);
+        String clientId = registration.getClientId();
+        String clientSecret = registration.getClientSecret();
+
+        if (clientId == null) {
+            return null;
+        }
+
+        switch (client){//구글, 페이스북은 제공, 네이버 카카오는 따로 Provider 선언해줘야함
+            case "google":
+                return CustomOAuth2Provider.GOOGLE.getBuilder(client)
+                        .clientId(clientId).clientSecret(clientSecret).build();
+            case "facebook":
+                return CommonOAuth2Provider.FACEBOOK.getBuilder(client)
+                        .clientId(clientId).clientSecret(clientSecret).build();
+            case "kakao":
+                return CustomOAuth2Provider.KAKAO.getBuilder(client)
+                        .clientId(clientId)
+                        .clientSecret(clientSecret).build();
+            case "naver":
+                return CustomOAuth2Provider.NAVER.getBuilder(client)
+                        .clientId(clientId)
+                        .clientSecret(clientSecret).build();
+        }
+        return null;
+    }
+
+/*
 
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository(){
@@ -113,7 +200,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userNameAttributeName("id")
                 .clientName("Kakao")
                 .build();
-    }
+    }*/
     /*private final Environment environment;
     private final String registration = "spring.security.oauth2.client.registration.";
 

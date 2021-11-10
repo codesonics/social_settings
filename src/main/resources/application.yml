@@ -9,28 +9,18 @@ spring:
     oauth2:
       client:
         registration:
-          facebook:
-            client-id: "380745696820214"
-            client-secret: "88a4a2795108c6a4fd93382be8f0b75"
-          google:
-            client-id: "xxx"
-            client-secret: "xxx"
           kakao:
             client-id: "3e6a005cd5712bc58005d784bd9f9e0c"
             client-secret: "eKbNfFJ5WJBoIGnDeYOA1ozqfAyZrsTz"
-            redirect-uri: "http://localhost:8080/login/oauth2/code/kakao" # http://localhost:8080/login/oauth2/code/kakao
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
-            scope:
-              - account_email
-              - profile
-            client-name: Kakao
-        provider:
-          kakao:
-            authorization_uri: https://kauth.kakao.com/oauth/authorize
-            token_uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user_name_attribute: id
+          google:
+            client-id: 발급받은 client-id key
+            client-secret: 발급받은 client-secret key
+          naver:
+            client-id: 발급받은 client-id key
+            client-secret: 발급받은 client-secret key
+          facebook:
+            client-id: 발급받은 client-id key
+            client-secret: 발급받은 client-secret key
 
 
   jpa:
